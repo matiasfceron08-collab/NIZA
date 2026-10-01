@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nisa Tech · Drones para agricultores</title>
+<style>
+  :root {
+    --bg: #f4f7f0;
+    --card: #ffffff;
+    --text: #1f2a1c;
+    --muted: #5d6b58;
+    --primary: #2e7d32;
+    --primary-dark: #1b5e20;
+    --accent: #e8f3e3;
+    --border: #d5e0cf;
+    --shadow: 0 6px 24px rgba(30, 60, 30, .10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #121a11;
+      --card: #1b261a;
+      --text: #e8f0e4;
+      --muted: #a3b39d;
+      --primary: #5fb865;
+      --primary-dark: #7ed084;
+      --accent: #24331f;
+      --border: #33452f;
+      --shadow: 0 6px 24px rgba(0, 0, 0, .35);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+  }
+  header {
+    background: linear-gradient(135deg, #1b5e20, #43a047);
+    color: #fff;
+    padding: 48px 20px 64px;
+    text-align: center;
+  }
+  header .logo { font-size: 42px; }
+  header h1 { margin: 6px 0 8px; font-size: clamp(28px, 6vw, 40px); letter-spacing: .5px; }
+  header p { margin: 0 auto; max-width: 560px; opacity: .95; font-size: 17px; }
+
+  main { max-width: 720px; margin: -36px auto 48px; padding: 0 16px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+  label { display: block; font-weight: 700; margin-bottom: 8px; font-size: 18px; }
+  .hint { color: var(--muted); font-size: 14px; margin: 0 0 12px; }
+  textarea {
+    width: 100%;
+    min-height: 130px;
+    padding: 14px;
+    font: inherit;
+    color: var(--text);
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    resize: vertical;
+  }
+  textarea:focus { outline: none; border-color: var(--primary); }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 18px; }
+  .chip {
+    font: inherit; font-size: 14px;
+    background: var(--accent); color: var(--text);
+    border: 1px solid var(--border);
+    padding: 6px 12px; border-radius: 999px; cursor: pointer;
+  }
+  .chip:hover { border-color: var(--primary); }
+  .btn {
+    width: 100%;
+    font: inherit; font-size: 18px; font-weight: 700;
+    background: var(--primary); color: #fff;
+    border: 0; border-radius: 12px;
+    padding: 14px 20px; cursor: pointer;
+    transition: transform .1s, background .2s;
+  }
+  .btn:hover { background: var(--primary-dark); }
+  .btn:active { transform: scale(.98); }
+  .btn.secondary {
+    background: transparent; color: var(--primary);
+    border: 2px solid var(--primary); font-size: 16px; margin-top: 16px;
+  }
+  .error { color: #c62828; font-size: 14px; margin: 8px 0 0; min-height: 20px; }
+
+  #result { display: none; animation: fade .35s ease; }
+  #result.show { display: block; }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  #result h2 { margin-top: 0; }
+  .echo {
+    background: var(--accent);
+    border-left: 4px solid var(--primary);
+    padding: 10px 14px; border-radius: 8px;
+    font-size: 15px; color: var(--muted);
+    margin-bottom: 18px; word-break: break-word;
+  }
+  .finding { border-top: 1px solid var(--border); padding-top: 16px; margin-top: 16px; }
+  .finding:first-of-type { border-top: 0; padding-top: 0; margin-top: 0; }
+  .finding h3 { margin: 0 0 6px; font-size: 19px; }
+  .finding .tag {
+    display: inline-block; font-size: 12px; font-weight: 700;
+    background: var(--primary); color: #fff;
+    padding: 2px 8px; border-radius: 6px; margin-bottom: 6px;
+  }
+  .finding h4 { margin: 20px 0 4px; font-size: 20px; color: var(--primary); }
+  .finding p { margin: 0; }
+  .finding ul { margin: 4px 0 0; padding-left: 20px; }
+  .cta {
+    margin-top: 20px; padding: 14px;
+    background: var(--accent); border-radius: 12px; font-size: 17px;
+  }
+  footer { text-align: center; color: var(--muted); font-size: 13px; padding: 0 16px 32px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo" aria-hidden="true">🚁🌱</div>
+  <h1>Nisa Tech</h1>
+  <p>Drones que ayudan a los agricultores a producir más y a organizar mejor su trabajo en el campo.</p>
+</header>
+
+<main>
+  <!-- ENTRADA -->
+  <section class="card" aria-labelledby="lbl">
+    <label for="problema" id="lbl">Cuéntanos qué pasa con tus cultivos</label>
+    <p class="hint">Escribe con tus palabras: qué cultivo tienes, qué notas raro y desde cuándo.</p>
+    <textarea id="problema" placeholder="Ejemplo: Las hojas de mi maíz se ponen amarillas y hay manchas en algunas zonas del terreno..."></textarea>
+
+    <div class="chips" aria-label="Ejemplos rápidos">
+      <button type="button" class="chip">Hay plagas en mis plantas</button>
+      <button type="button" class="chip">No sé si estoy regando bien</button>
+      <button type="button" class="chip">Mi terreno es muy grande y no alcanzo a revisarlo</button>
+      <button type="button" class="chip">Mucha maleza en el cultivo</button>
+    </div>
+
+    <button type="button" class="btn" id="btnAnalizar">Ver cómo podemos ayudarte</button>
+    <p class="error" id="error" role="alert"></p>
+  </section>
+
+  <!-- SALIDA -->
+  <section class="card" id="result" aria-live="polite">
+    <h2>Así podemos ayudarte</h2>
+    <div class="echo" id="echo"></div>
+    <div id="findings"></div>
+    <div class="cta">
+      📞 <strong>Siguiente paso:</strong> el equipo de Nisa Tech puede visitar tu parcela, hacer un vuelo de prueba y mostrarte un mapa con resultados. Esta orientación es preliminar y no reemplaza la revisión de un técnico agrónomo.
+    </div>
+    <button type="button" class="btn secondary" id="btnReiniciar">Hacer otra consulta</button>
+  </section>
+</main>
+
+<footer>© Nisa Tech · Proyecto estudiantil de tecnología agrícola</footer>
+
+<script>
+  // ---------- Base de conocimiento ----------
+  const CATEGORIAS = [
+    {
+      id: "plagas",
+      titulo: "Plagas en el cultivo",
+      palabras: ["plaga", "insecto", "gusano", "oruga", "pulgon", "mosca", "langosta", "hormiga", "comen", "mordidas", "agujeros", "roen"],
+      como: "Un dron con cámara multiespectral sobrevuela el cultivo y detecta zonas con estrés antes de que el daño sea visible a simple vista. Así sabes exactamente dónde está el foco de la plaga.",
+      pasos: [
+        "Vuelo de monitoreo para mapear las zonas afectadas.",
+        "Aplicación dirigida solo en los puntos infestados, con menos producto.",
+        "Vuelos de seguimiento semanales para comprobar que la plaga baja."
+      ]
+    },
+    {
+      id: "enfermedades",
+      titulo: "Posibles enfermedades o hongos",
+      palabras: ["amarill", "mancha", "hongo", "enfermedad", "marchit", "seca", "secan", "pudri", "moho", "roya", "tizon", "quema"],
+      como: "Las imágenes aéreas muestran cambios de color y vigor en las plantas que el ojo no distingue. Con ellas se localizan las áreas enfermas y se evita que se extiendan.",
+      pasos: [
+        "Vuelo con cámara para generar un mapa de salud del cultivo (índice de vigor).",
+        "Toma de muestras solo en las zonas marcadas para confirmar la causa.",
+        "Tratamiento localizado y nuevo vuelo para verificar la recuperación."
+      ]
+    },
+    {
+      id: "riego",
+      titulo: "Riego y manejo del agua",
+      palabras: ["riego", "regar", "regando", "agua", "sequia", "seco", "inund", "encharc", "humedad", "lluvia", "gota"],
+      como: "Los sensores térmicos del dron identifican qué partes del terreno tienen exceso o falta de agua. Con eso puedes regar donde hace falta y ahorrar agua y energía.",
+      pasos: [
+        "Vuelo térmico para medir la humedad y el estrés hídrico por zonas.",
+        "Mapa de riego con las áreas que necesitan más o menos agua.",
+        "Detección de fugas o zonas con mal drenaje."
+      ]
+    },
+    {
+      id: "suelo",
+      titulo: "Nutrición y crecimiento desigual",
+      palabras: ["fertiliz", "abono", "nutriente", "suelo", "tierra", "crece poco", "crecimiento", "desigual", "pequen", "rendimiento", "produce poco", "baja produccion", "cosecha pobre", "nitrogeno"],
+      como: "El dron compara el vigor de las plantas en todo el lote y revela zonas de bajo rendimiento. Esto permite fertilizar por zonas (agricultura de precisión) en lugar de todo el terreno por igual.",
+      pasos: [
+        "Mapa de vigor para ver dónde crece bien y dónde no.",
+        "Plan de fertilización por zonas para no gastar de más.",
+        "Comparación entre temporadas para medir la mejora."
+      ]
+    },
+    {
+      id: "maleza",
+      titulo: "Maleza que compite con el cultivo",
+      palabras: ["maleza", "hierba", "hierbas", "yuyo", "monte", "mala hierba", "zacate", "invadid"],
+      como: "Con imágenes de alta resolución el dron distingue el cultivo de la maleza y crea un mapa de las áreas invadidas, para intervenir solo donde es necesario.",
+      pasos: [
+        "Vuelo temprano para detectar la maleza en sus primeras etapas.",
+        "Mapa de infestación para deshierbar o aplicar por sectores.",
+        "Seguimiento para evitar que vuelva a crecer."
+      ]
+    },
+    {
+      id: "logistica",
+      titulo: "Logística, tiempo y tamaño del terreno",
+      palabras: ["logistica", "grande", "hectarea", "terreno", "tiempo", "recorrer", "revisar", "cosecha", "cosechar", "transporte", "mano de obra", "trabajadores", "costo", "caro", "organizar", "planificar", "no alcanzo", "no me da"],
+      como: "Un dron cubre en minutos lo que a pie toma horas. Con un mapa aéreo actualizado puedes decidir dónde enviar al personal, en qué orden cosechar y cuándo, y así ahorrar tiempo y dinero.",
+      pasos: [
+        "Levantamiento aéreo completo de la parcela en una sola visita.",
+        "Priorización de tareas: qué zonas atender primero.",
+        "Estimación de cosecha para planear personal y transporte."
+      ]
+    }
+  ];
+
+  const GENERAL = {
+    titulo: "Monitoreo general de tu cultivo",
+    palabras: [],
+    como: "No encontramos un problema específico en tu situación. Un vuelo de diagnóstico con dron nos permite ver todo el cultivo, encontrar los problemas y decidir qué hacer.",
+    pasos: [
+      "Vuelo de diagnóstico general de tu parcela.",
+      "Informe con mapas de salud, agua y crecimiento.",
+      "Recomendaciones claras y priorizadas para mejorar tu producción."
+    ]
+  };
+
+  // ---------- Utilidades ----------
+  const $ = (id) => document.getElementById(id);
+
+  function normalizar(texto) {
+    return texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+
+  // ---------- Proceso: analizar el texto ----------
+  function analizar(texto) {
+    const t = normalizar(texto);
+    const puntuadas = CATEGORIAS.map((cat) => {
+      const puntos = cat.palabras.reduce((suma, p) => suma + (t.includes(normalizar(p)) ? 1 : 0), 0);
+      return { cat, puntos };
+    })
+    .filter((x) => x.puntos > 0)
+    .sort((a, b) => b.puntos - a.puntos)
+    .slice(0, 3)
+    .map((x) => x.cat);
+
+    return puntuadas.length ? puntuadas : [GENERAL];
+  }
+
+  // ---------- Salida: mostrar resultado ----------
+  function crear(tag, clase, texto) {
+    const el = document.createElement(tag);
+    if (clase) el.className = clase;
+    if (texto) el.textContent = texto;
+    return el;
+  }
+
+  function mostrarResultado(texto, hallazgos) {
+    $("echo").textContent = "Tu consulta: “" + texto + "”";
+    const cont = $("findings");
+    cont.innerHTML = "";
+
+    hallazgos.forEach((h, i) => {
+      const bloque = crear("div", "finding");
+      bloque.appendChild(crear("span", "tag", i === 0 ? "Más probable" : "También relacionado"));
+      bloque.appendChild(crear("h3", "", h.titulo));
+      bloque.appendChild(crear("h4", "", "Cómo te ayudamos con drones"));
+      bloque.appendChild(crear("p", "", h.como));
+      bloque.appendChild(crear("h4", "", "Pasos sugeridos"));
+      const ul = crear("ul");
+      h.pasos.forEach((p) => ul.appendChild(crear("li", "", p)));
+      bloque.appendChild(ul);
+      cont.appendChild(bloque);
+    });
+
+    const res = $("result");
+    res.classList.add("show");
+    res.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  // ---------- Eventos ----------
+  $("btnAnalizar").addEventListener("click", () => {
+    const texto = $("problema").value.trim();
+    if (texto.length < 8) {
+      $("error").textContent = "Por favor describe tu problema con un poco más de detalle.";
+      $("problema").focus();
+      return;
+    }
+    $("error").textContent = "";
+    mostrarResultado(texto, analizar(texto));
+  });
+
+  document.querySelectorAll(".chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      $("problema").value = chip.textContent;
+      $("error").textContent = "";
+      $("problema").focus();
+    });
+  });
+
+  $("btnReiniciar").addEventListener("click", () => {
+    $("problema").value = "";
+    $("result").classList.remove("show");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    $("problema").focus();
+  });
+
+  // Ctrl + Enter también envía
+  $("problema").addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) $("btnAnalizar").click();
+  });
+</script>
+</body>
+</html>
